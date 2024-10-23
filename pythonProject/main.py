@@ -27,6 +27,9 @@ MENU
 0 - SAIR
 1 - Cadastrar pets
 2 - Exibir dados 
+3 - Editar pet - apertar enter pra deixar do jeito q ta - mostrar o animal que está sendo editado
+4 - Excluir pet
+5 - Excluir todos os pets
         """)
     ex = input("Escolha uma opção: ")
     try:
@@ -74,6 +77,18 @@ MENU
                 else:
                     print(dados_df)
                 os.system("pause")
+
+            case 3:
+                #editar pet
+                id = input("Digite o id do pet que será editado: ")
+                inst_consulta.execute("SELECT Id FROM petshop")
+                data = inst_consulta.fetchall()
+                if id in data:
+                    inst_consulta.execute(f"SELECT * FROM petshop WHERE Id = '{id}'")
+                    data = inst_consulta.fetchall()
+                    print(data)
+                else:
+                    print("a")
 
             case _:
                 print("Opção inválida")
