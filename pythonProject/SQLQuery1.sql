@@ -3,7 +3,7 @@ use petshop
 
 create table petshop(
 	Id int PRIMARY KEY IDENTITY,
-	Tipo_pet varchar(30),
+	tipo_pet varchar(30),
 	nome_pet varchar(30),
 	idade INT
 );
