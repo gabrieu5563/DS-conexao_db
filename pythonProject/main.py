@@ -11,6 +11,7 @@ try:
 
     conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
     inst_cadastro = conn.cursor() #objeto utilizado pra fazer instrução sql
+    inst_consulta = conn.cursor()
 except Exception as e:
     print(f"Erro: {e}")
     conexao = False
@@ -25,6 +26,7 @@ while conexao: #só entra se conexao for true
 MENU
 0 - SAIR
 1 - Cadastrar pets
+2 - Exibir dados 
         """)
     ex = input("Escolha uma opção: ")
     try:
@@ -55,6 +57,23 @@ MENU
                     print(f"Erro em alguma transação da tabela {e}")
                 else:
                     print("Dados gravados com sucesso")
+
+            case 2:
+                lista_dados = []
+                inst_consulta.execute("SELECT * FROM petshop")
+                data = inst_consulta.fetchall() #pega todos os registros e joga no objeto data
+
+                for i in data:
+                    lista_dados.append(i)
+                lista_dados = sorted(lista_dados)
+
+                dados_df =pd.DataFrame.from_records(lista_dados, columns=['Id', 'Tipo', 'Nome', 'Idade'], index='Id')
+
+                if dados_df.empty:
+                    print("Não há pets cadastrados")
+                else:
+                    print(dados_df)
+                os.system("pause")
 
             case _:
                 print("Opção inválida")
