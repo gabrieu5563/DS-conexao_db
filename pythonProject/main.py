@@ -28,7 +28,7 @@ MENU
 0 - SAIR
 1 - Cadastrar pets
 2 - Exibir dados 
-3 - Editar pet - apertar enter pra deixar do jeito q ta - mostrar o animal que está sendo editado
+3 - Editar pet
 4 - Excluir pet
 5 - Excluir todos os pets
         """)
@@ -122,6 +122,20 @@ MENU
                 else:
                     print("Pet não encontrado")
                     os.system("pause")
+
+            case 4:
+                id = int(input("Digite o id do pet que será excluído: "))
+                idFound = getId(id, inst_consulta)
+
+                if idFound:
+                    inst_consulta.execute(f"SELECT * FROM petshop WHERE Id = '{id}'")
+                    dados = inst_consulta.fetchall()
+                    dados_df = pd.DataFrame.from_records(dados, columns=['Id', 'Tipo', 'Nome', 'Idade'], index='Id')
+                    os.system("cls")
+                    print(dados_df)
+
+                else:
+                    print("Pet não encontrado")
 
             case _:
                 print("Opção inválida")
