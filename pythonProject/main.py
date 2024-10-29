@@ -1,13 +1,14 @@
 import pyodbc
 import pandas as pd
 import os
+from subalgoritmos import *
 
 os.system("cls")
 try:
     server = 'localhost'
     database = 'petshop'
     username = 'sa'
-    password = '*123456HAS*'
+    password = '123456'
 
     conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
     inst_cadastro = conn.cursor() #objeto utilizado pra fazer instrução sql
@@ -43,9 +44,9 @@ MENU
 
             case 1:
                 try:
-                    tipo = input("Tipo.....")
-                    nome = input("Nome.....")
-                    idade = int(input("Idade....."))
+                    tipo = input("Tipo: ")
+                    nome = input("Nome: ")
+                    idade = int(input("Idade: "))
 
                     cadastro = f"""
                             INSERT INTO petshop (tipo_pet, nome_pet, idade)
@@ -56,8 +57,8 @@ MENU
                     conn.commit()
                 except ValueError:
                     print("Digite uma idade válida")
-                except e:
-                    print(f"Erro em alguma transação da tabela {e}")
+                except:
+                    print(f"Erro em alguma transação da tabela {Exceptions}")
                 else:
                     print("Dados gravados com sucesso")
 
@@ -80,15 +81,47 @@ MENU
 
             case 3:
                 #editar pet
-                id = input("Digite o id do pet que será editado: ")
-                inst_consulta.execute("SELECT Id FROM petshop")
-                data = inst_consulta.fetchall()
-                if id in data:
+                id = int(input("Digite o id do pet que será editado: "))
+                idFound = getId(id, inst_consulta)
+
+                if idFound:
                     inst_consulta.execute(f"SELECT * FROM petshop WHERE Id = '{id}'")
-                    data = inst_consulta.fetchall()
-                    print(data)
+                    dados = inst_consulta.fetchall()
+                    dados_df = pd.DataFrame.from_records(dados, columns=['Id', 'Tipo', 'Nome', 'Idade'], index='Id')
+                    os.system("cls")
+                    print(dados_df)
+
+                    inst_consulta.execute(f"SELECT tipo_pet, nome_pet, idade  FROM petshop WHERE Id = '{id}'")
+                    pet_data = inst_consulta.fetchone()
+
+                    tipoAtual, nomeAtual, idadeAtual = pet_data
+
+                    try:
+                        tipo = input("Tipo: ") or tipoAtual
+                        nome = input("Nome: ") or nomeAtual
+                        idadeInput = input("Idade: ")
+                        idade = int(idadeInput) if idadeInput else idadeAtual
+
+                        cadastro = f"""
+                            UPDATE petshop 
+                            SET tipo_pet = '{tipo}', nome_pet = '{nome}', idade = '{idade}'
+                            WHERE Id = {int(id)}
+                        """
+
+                        inst_cadastro.execute(cadastro)
+                        conn.commit()
+                    except ValueError:
+                        print("Digite uma idade válida")
+                        os.system("pause")
+                    except:
+                        print(f"Erro {Exception}")
+                        os.system("pause")
+                    else:
+                        print("Dados gravados")
+                        os.system("pause")
                 else:
-                    print("a")
+                    print("Pet não encontrado")
+                    os.system("pause")
 
             case _:
                 print("Opção inválida")
