@@ -13,6 +13,7 @@ try:
     conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
     inst_cadastro = conn.cursor() #objeto utilizado pra fazer instrução sql
     inst_consulta = conn.cursor()
+    inst_delete = conn.cursor()
 except Exception as e:
     print(f"Erro: {e}")
     conexao = False
@@ -57,10 +58,13 @@ MENU
                     conn.commit()
                 except ValueError:
                     print("Digite uma idade válida")
+                    os.system("pause")
                 except:
-                    print(f"Erro em alguma transação da tabela {Exceptions}")
+                    print(f"Erro em alguma transação da tabela {Exception}")
+                    os.system("pause")
                 else:
                     print("Dados gravados com sucesso")
+                    os.system("pause")
 
             case 2:
                 lista_dados = []
@@ -133,9 +137,54 @@ MENU
                     dados_df = pd.DataFrame.from_records(dados, columns=['Id', 'Tipo', 'Nome', 'Idade'], index='Id')
                     os.system("cls")
                     print(dados_df)
+                    while True:
+                        conf = input("Você gostaria de excluir este pet? [0]Não, [1]Sim: ")
+                        try:
+                            conf = int(conf)
+                        except:
+                            print("Escolha uma opção válida")
+
+                        match conf:
+                            case 0:
+                                print("Operação Cancelada")
+                                os.system("pause")
+                                break
+
+                            case 1:
+                                apagar = f"DELETE FROM petshop WHERE id = '{id}'"
+                                inst_delete.execute(apagar)
+                                conn.commit()
+                                print("Pet excluído")
+                                os.system("pause")
+                                break
+
+                            case _:
+                                print("Digite uma opção válida")
 
                 else:
                     print("Pet não encontrado")
+
+            case 5:
+                while True:
+                    conf = input("Você gostaria de excluir todos os pets? [0]Não, [1]Sim: ")
+                    try:
+                        conf = int(conf)
+                    except:
+                        print("Escolha uma opção válida")
+
+                    match conf:
+                        case 0:
+                            print("Operação Cancelada")
+                            os.system("pause")
+                            break
+
+                        case 1:
+                            apagar = f"DELETE FROM petshop"
+                            inst_delete.execute(apagar)
+                            conn.commit()
+                            print("Pets excluídos")
+                            os.system("pause")
+                            break
 
             case _:
                 print("Opção inválida")
